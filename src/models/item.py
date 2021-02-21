@@ -1,5 +1,8 @@
 from db import db
-from typing import List, Dict  # type hinting
+from typing import List, Dict, Union  # type hinting
+
+
+item_json = Dict[str, Union[int, str, float]]   # Dict[keyAsString, ValuesIs(int , str or float) ]
 
 
 class ItemModel(db.Model):
@@ -17,7 +20,7 @@ class ItemModel(db.Model):
         self.price = price
         self.store_id = store_id
 
-    def json(self) -> Dict:
+    def json(self) -> item_json:
         return {
             "id": self.id,
             "name": self.name,
@@ -26,11 +29,11 @@ class ItemModel(db.Model):
         }
 
     @classmethod
-    def find_by_name(cls, name: str):
+    def find_by_name(cls, name: str) -> "ItemModel":  # return ItemModel obj
         return cls.query.filter_by(name=name).first()
 
     @classmethod
-    def find_all(cls) -> List:
+    def find_all(cls) -> List["ItemModel"]:  # return list of ItemModel objs
         return cls.query.all()
 
     def save_to_db(self) -> None:
