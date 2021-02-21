@@ -2,7 +2,9 @@ from db import db
 from typing import List, Dict, Union  # type hinting
 
 
-item_json = Dict[str, Union[int, str, float]]   # Dict[keyAsString, ValuesIs(int , str or float) ]
+item_json = Dict[
+    str, Union[int, str, float]
+]  # Dict[keyAsString, ValuesIs(int , str or float) ]
 
 
 class ItemModel(db.Model):
