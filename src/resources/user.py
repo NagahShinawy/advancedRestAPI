@@ -8,6 +8,7 @@ from flask_jwt_extended import (
     jwt_required,
     get_raw_jwt,
 )
+import datetime
 from models.user import UserModel
 from blacklist import BLACKLIST
 
@@ -64,7 +65,11 @@ class UserLogin(Resource):
         # this is what the `authenticate()` function did in security.py
         if user and safe_str_cmp(user.password, data["password"]):
             # identity= is what the identity() function did in security.py—now stored in the JWT
-            access_token = create_access_token(identity=user.id, fresh=True)
+            access_token = create_access_token(
+                identity=user.id,
+                fresh=True,
+                expires_delta=datetime.timedelta(minutes=15),
+            )
             refresh_token = create_refresh_token(user.id)
             return {"access_token": access_token, "refresh_token": refresh_token}, 200
 

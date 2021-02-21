@@ -37,7 +37,7 @@ jwt = JWTManager(app)
 
 @jwt.user_claims_loader
 def add_claims_to_jwt(
-    identity
+    identity,
 ):  # Remember identity is what we define when creating the access token
     if (
         identity == 1
@@ -63,7 +63,7 @@ def expired_token_callback():
 
 @jwt.invalid_token_loader
 def invalid_token_callback(
-    error
+    error,
 ):  # we have to keep the argument here, since it's passed in by the caller internally
     return (
         jsonify(
