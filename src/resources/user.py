@@ -11,13 +11,15 @@ from flask_jwt_extended import (
 import datetime
 from models.user import UserModel
 from blacklist import BLACKLIST
+from utils.errors import BLANK_ERROR
+
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument(
-    "username", type=str, required=True, help="This field cannot be blank."
+    "username", type=str, required=True, help=BLANK_ERROR.format("username")
 )
 _user_parser.add_argument(
-    "password", type=str, required=True, help="This field cannot be blank."
+    "password", type=str, required=True, help=BLANK_ERROR.format("password")
 )
 
 
