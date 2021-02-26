@@ -18,12 +18,11 @@ class BookSchema(Schema):
             raise ValidationError(f"'{value}' is more than 5 chars ")
         return value
 
-    #
-    # @validates("description")
-    # def validate_description(self, value):
-    #     if len(value) > 10:
-    #         raise ValidationError(f"description is more than 300 chars")
-    #     return value
+    @validates("description")
+    def validate_description(self, value):
+        if len(value) > 10:
+            raise ValidationError(f"description is more than 300 chars")
+        return value
 
 
 class Book:
