@@ -11,7 +11,7 @@ from utils.errors import (
     OBJ_MOT_FOUND,
     NAME_ALREADY_EXISTS,
     ERROR_INSERTING,
-    OBJ_DELETED
+    OBJ_DELETED,
 )
 from utils import status
 
@@ -29,13 +29,19 @@ class Item(Resource):
         item = ItemModel.find_by_name(name)
         if item:
             return item.json(), status.HTTP_200_OK
-        return {"message": OBJ_MOT_FOUND.format(self.__class__.__name__)}, status.HTTP_404_NOT_FOUND
+        return {
+            "message": OBJ_MOT_FOUND.format(cls=self.__class__.__name__)
+        }, status.HTTP_404_NOT_FOUND
 
     @fresh_jwt_required
     def post(self, name: str):
         if ItemModel.find_by_name(name):
             return (
-                {"message": NAME_ALREADY_EXISTS.format(obj=self.__class__.__name__, name=name)},
+                {
+                    "message": NAME_ALREADY_EXISTS.format(
+                        cls=self.__class__.__name__, name=name
+                    )
+                },
                 status.HTTP_400_BAD_REQUEST,
             )
 
@@ -46,7 +52,9 @@ class Item(Resource):
         try:
             item.save_to_db()
         except:
-            return {"message": ERROR_INSERTING.format(self.__class__.__name__)}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            return {
+                "message": ERROR_INSERTING.format(self.__class__.__name__)
+            }, status.HTTP_500_INTERNAL_SERVER_ERROR
 
         return item.json(), status.HTTP_201_CREATED
 
@@ -55,8 +63,12 @@ class Item(Resource):
         item = ItemModel.find_by_name(name)
         if item:
             item.delete_from_db()
-            return {"message": OBJ_DELETED.format(self.__class__.__name__)}, status.HTTP_200_OK
-        return {"message": OBJ_MOT_FOUND.format(self.__class__.__name__)}, status.HTTP_404_NOT_FOUND
+            return {
+                "message": OBJ_DELETED.format(self.__class__.__name__)
+            }, status.HTTP_200_OK
+        return {
+            "message": OBJ_MOT_FOUND.format(cls=self.__class__.__name__)
+        }, status.HTTP_404_NOT_FOUND
 
     def put(self, name: str):
         data = Item.parser.parse_args()

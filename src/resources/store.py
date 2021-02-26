@@ -4,7 +4,7 @@ from utils.errors import (
     OBJ_MOT_FOUND,
     NAME_ALREADY_EXISTS,
     ERROR_INSERTING,
-    get_class_name
+    get_class_name,
 )
 from utils import status
 
@@ -14,12 +14,18 @@ class Store(Resource):
         store = StoreModel.find_by_name(name)
         if store:
             return store.json()
-        return {"message": OBJ_MOT_FOUND.format(get_class_name(self))}, status.HTTP_404_NOT_FOUND
+        return {
+            "message": OBJ_MOT_FOUND.format(cls=get_class_name(self))
+        }, status.HTTP_404_NOT_FOUND
 
     def post(self, name: str):
         if StoreModel.find_by_name(name):
             return (
-                {"message": NAME_ALREADY_EXISTS.format(obj=get_class_name(self), name=name)},
+                {
+                    "message": NAME_ALREADY_EXISTS.format(
+                        cls=get_class_name(self), name=name
+                    )
+                },
                 status.HTTP_400_BAD_REQUEST,
             )
 
@@ -27,7 +33,9 @@ class Store(Resource):
         try:
             store.save_to_db()
         except:
-            return {"message": ERROR_INSERTING.format(get_class_name(self))}, status.HTTP_500_INTERNAL_SERVER_ERROR
+            return {
+                "message": ERROR_INSERTING.format(get_class_name(self))
+            }, status.HTTP_500_INTERNAL_SERVER_ERROR
 
         return store.json(), status.HTTP_201_CREATED
 
@@ -37,7 +45,9 @@ class Store(Resource):
             store.delete_from_db()
             # return {"message": "Store deleted."}, 204
             return "", status.HTTP_204_NO_CONTENT
-        return {"message": OBJ_MOT_FOUND.format(get_class_name(self))}, status.HTTP_404_NOT_FOUND
+        return {
+            "message": OBJ_MOT_FOUND.format(cls=get_class_name(self))
+        }, status.HTTP_404_NOT_FOUND
 
 
 class StoreList(Resource):

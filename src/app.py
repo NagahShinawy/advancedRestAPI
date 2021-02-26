@@ -7,6 +7,8 @@ from blacklist import BLACKLIST
 from resources.user import UserRegister, UserLogin, User, TokenRefresh, UserLogout
 from resources.item import Item, ItemList
 from resources.store import Store, StoreList
+from utils import status
+
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -58,7 +60,7 @@ def check_if_token_in_blacklist(decrypted_token):
 # The original ones may not be in a very pretty format (opinionated)
 @jwt.expired_token_loader
 def expired_token_callback():
-    return jsonify({"message": "The token has expired.", "error": "token_expired"}), 401
+    return jsonify({"message": "The token has expired.", "error": "token_expired"}), status.HTTP_401_UNAUTHORIZED
 
 
 @jwt.invalid_token_loader
@@ -69,7 +71,7 @@ def invalid_token_callback(
         jsonify(
             {"message": "Signature verification failed.", "error": "invalid_token"}
         ),
-        401,
+        status.HTTP_401_UNAUTHORIZED,
     )
 
 
@@ -82,7 +84,7 @@ def missing_token_callback(error):
                 "error": "authorization_required",
             }
         ),
-        401,
+        status.HTTP_401_UNAUTHORIZED,
     )
 
 
@@ -92,7 +94,7 @@ def token_not_fresh_callback():
         jsonify(
             {"description": "The token is not fresh.", "error": "fresh_token_required"}
         ),
-        401,
+        status.HTTP_401_UNAUTHORIZED,
     )
 
 
@@ -102,20 +104,20 @@ def revoked_token_callback():
         jsonify(
             {"description": "The token has been revoked.", "error": "token_revoked"}
         ),
-        401,
+        status.HTTP_401_UNAUTHORIZED,
     )
 
 
-api.add_resource(Store, "/store/<string:name>")
-api.add_resource(StoreList, "/stores")
-api.add_resource(Item, "/item/<string:name>")
-api.add_resource(ItemList, "/items")
-api.add_resource(UserRegister, "/register")
-api.add_resource(User, "/user/<int:user_id>")
-api.add_resource(UserLogin, "/login")
-api.add_resource(TokenRefresh, "/refresh")
-api.add_resource(UserLogout, "/logout")
+api.add_resource(Store, "/store/<string:name>/")
+api.add_resource(StoreList, "/stores/")
+api.add_resource(Item, "/item/<string:name>/")
+api.add_resource(ItemList, "/items/")
+api.add_resource(UserRegister, "/register/")
+api.add_resource(User, "/user/<int:user_id>/")
+api.add_resource(UserLogin, "/login/")
+api.add_resource(TokenRefresh, "/refresh/")
+api.add_resource(UserLogout, "/logout/")
 
 if __name__ == "__main__":
     db.init_app(app)
-    app.run(port=5060, debug=True)
+    app.run(port=5060, debug=True, use_reloader=True)

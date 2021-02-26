@@ -11,8 +11,14 @@ from flask_jwt_extended import (
 import datetime
 from models.user import UserModel
 from blacklist import BLACKLIST
-from utils.errors import BLANK_ERROR
-
+from utils import status
+from utils.errors import (
+    BLANK_ERROR,
+    OBJ_MOT_FOUND,
+    NAME_ALREADY_EXISTS,
+    INVALID_USERNAME_OR_PASSWORD,
+)
+from utils.success import CREATED_SUCCESSFULLY, LOGOUT_SUCCESSFULLY
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument(
@@ -28,12 +34,16 @@ class UserRegister(Resource):
         data = _user_parser.parse_args()
 
         if UserModel.find_by_username(data["username"]):
-            return {"message": "A user with that username already exists."}, 400
+            return {
+                "message": NAME_ALREADY_EXISTS.format(
+                    cls=self.__class__.__name__, name=data["username"]
+                )
+            }, status.HTTP_400_BAD_REQUEST
 
         user = UserModel(**data)
         user.save_to_db()
 
-        return {"message": "User created successfully."}, 201
+        return {"message": CREATED_SUCCESSFULLY}, status.HTTP_201_CREATED
 
 
 class User(Resource):
@@ -46,16 +56,20 @@ class User(Resource):
     def get(cls, user_id: int):
         user = UserModel.find_by_id(user_id)
         if not user:
-            return {"message": "User not found."}, 404
-        return user.json(), 200
+            return {
+                "message": OBJ_MOT_FOUND.format(cls=cls.__name__)
+            }, status.HTTP_404_NOT_FOUND
+        return user.json(), status.HTTP_200_OK
 
     @classmethod
     def delete(cls, user_id: int):
         user = UserModel.find_by_id(user_id)
         if not user:
-            return {"message": "User not found."}, 404
+            return {
+                "message": OBJ_MOT_FOUND.format(cls=cls.__name__)
+            }, status.HTTP_404_NOT_FOUND
         user.delete_from_db()
-        return {"message": "User deleted."}, 200
+        return "", status.HTTP_204_NO_CONTENT
 
 
 class UserLogin(Resource):
@@ -73,9 +87,12 @@ class UserLogin(Resource):
                 expires_delta=datetime.timedelta(minutes=15),
             )
             refresh_token = create_refresh_token(user.id)
-            return {"access_token": access_token, "refresh_token": refresh_token}, 200
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+            }, status.HTTP_200_OK
 
-        return {"message": "Invalid credentials!"}, 401
+        return {"message": INVALID_USERNAME_OR_PASSWORD}, status.HTTP_401_UNAUTHORIZED
 
 
 class UserLogout(Resource):
@@ -84,7 +101,9 @@ class UserLogout(Resource):
         jti = get_raw_jwt()["jti"]  # jti is "JWT ID", a unique identifier for a JWT.
         user_id = get_jwt_identity()
         BLACKLIST.add(jti)
-        return {"message": "User <id={}> successfully logged out.".format(user_id)}, 200
+        return {
+            "message": LOGOUT_SUCCESSFULLY.format(id=user_id)
+        }, status.HTTP_200_OK
 
 
 class TokenRefresh(Resource):
@@ -92,4 +111,4 @@ class TokenRefresh(Resource):
     def post(self):
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user, fresh=False)
-        return {"access_token": new_token}, 200
+        return {"access_token": new_token}, status.HTTP_200_OK

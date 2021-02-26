@@ -1,2 +1,20 @@
 > which black
 > /d/containers/Work/lean-motherhood/vital-signs-service/venv/Scripts/black
+
+
+=========================================
+Marshmallow
+
+serialization : from obj to dictionanry
+deserialization : from dictionnary to obj
+
+clean_code = Book("Clean Code", "Bob", "Book to write clean code")
+flask_api = Book("Flask for Building API", "martin", "Build API with flask")
+# print(clean_code)
+# print(flask_api)
+
+book_schema = BookSchema()   # 1- create Schema
+clean_code_serialization = book_schema.dump(clean_code)  # 2- dump book obj to be serialization (dictionary)
+flask_api_serialization = book_schema.dump(flask_api)   # 3- dump book obj to be serialization  (dictionary)
+print(clean_code_serialization)
+print(flask_api_serialization)
