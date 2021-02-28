@@ -18,3 +18,24 @@ clean_code_serialization = book_schema.dump(clean_code)  # 2- dump book obj to b
 flask_api_serialization = book_schema.dump(flask_api)   # 3- dump book obj to be serialization  (dictionary)
 print(clean_code_serialization)
 print(flask_api_serialization)
+
+=======================
+
+1- virtualenv is a very popular tool that creates isolated Python environments for Python libraries
+2- pyenv is used to isolate Python versions
+
+======================
+
+use load with POST  ( to load data to model)
+use dump with GET  ( to get data from model)
+
+
+==========================
+setup flask
+ * Tip: There are .env files present. Do "pip install python-dotenv" to use them.
+** pip install python-dotenv
+python will use .flaskenv automaticy after installing "python-dotenv"
+
+
+
+
